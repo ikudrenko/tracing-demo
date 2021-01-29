@@ -1,0 +1,5 @@
+provider1:
+  uri: "http://item-provider-1:8083/items"
+
+provider2:
+  uri: "http://item-provider-2:8082/items"

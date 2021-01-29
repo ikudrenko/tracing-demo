@@ -1,0 +1,3 @@
+spring:
+  datasource:
+    url: "jdbc:mysql://item-provider2-db:3306/provider2?autoReconnect=true"

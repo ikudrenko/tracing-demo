@@ -6,8 +6,8 @@ server:
   port: 8081
 
 provider1:
-  uri: "http://localhost:8083/items"
+  uri: "http://localhost:8082/items"
 
 
 provider2:
-  uri: "http://localhost:8082/items"
+  uri: "http://localhost:8083/items"

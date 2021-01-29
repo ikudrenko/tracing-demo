@@ -16,7 +16,6 @@ services:
       MYSQL_PASSWORD: "p@ssw0rd"
       MYSQL_DATABASE: "provider1"
     volumes:
-      - "./item-provider-1/dbdata:/var/lib/mysql"
       - "./item-provider-1/scripts/init-db.sql:/data/application/init-db.sql"
     command: [
         "--default-authentication-plugin=mysql_native_password",
@@ -37,24 +36,11 @@ services:
       MYSQL_PASSWORD: "p@ssw0rd"
       MYSQL_DATABASE: "provider2"
     volumes:
-      - "./item-provider-2/dbdata:/var/lib/mysql"
       - "./item-provider-2/scripts/init-db.sql:/data/application/init-db.sql"
     command: [
         "--default-authentication-plugin=mysql_native_password",
         "--init-file=/data/application/init-db.sql"
     ]
-
-  # https://www.jaegertracing.io/docs/1.18/getting-started/
-  jaeger:
-    image: "jaegertracing/all-in-one:latest"
-    ports:
-      - "16686:16686"
-      - "14250:14250"
-
-  zipkin:
-    image: "openzipkin/zipkin:latest"
-    ports:
-      - "9411:9411"
 
   nsqlookupd:
     image: 666665886686.dkr.ecr.us-east-1.amazonaws.com/life360/nsq:0.3.7
@@ -79,3 +65,33 @@ services:
       - "4171:4171"
     depends_on:
       - nsqlookupd
+
+  api:
+    image: "tracing-demo/api:none-latest"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - item-provider-1
+      - item-provider-2
+
+  item-provider-1:
+    image: "tracing-demo/item-provider-1:none-latest"
+    ports:
+      - "8083:8083"
+    depends_on:
+      - nsqlookupd
+      - nsqd
+      - item-provider1-db
+
+  item-provider-2:
+    image: "tracing-demo/item-provider-2:none-latest"
+    ports:
+      - "8082:8082"
+    depends_on:
+      - item-provider2-db
+
+  notification-comsumer:
+    image: "tracing-demo/notification-comsumer:none-latest"
+    depends_on:
+      - nsqlookupd
+      - nsqd

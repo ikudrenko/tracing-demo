@@ -15,9 +15,9 @@ spring:
       generate-ddl: false
       hibernate.naming_strategy: "org.hibernate.cfg.ImprovedNamingStrategy"
 
-#logging:
-#  level:
-#    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
-#
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
 server:
   port: 8082

@@ -1,0 +1,3 @@
+nsq:
+  publisher:
+    host: "nsqlookupd:4161"

@@ -22,31 +22,32 @@ public class ItemsClient {
     @Autowired
     private RestTemplate restTemplate;
 
-    public ItemsClient(@Value("provider1.uri") String providers1URI,
-          @Value("provider2.uri")String providers2URI) {
+    public ItemsClient(@Value("${provider1.uri}") String providers1URI,
+          @Value("${provider2.uri}") String providers2URI) {
         this.providers1URI = providers1URI;
         this.providers2URI = providers2URI;
+        log.info("providers1URI = {}", providers1URI);
+        log.info("providers2URI = {}", providers2URI);
+
     }
 
-    public List<Item> getProvider1Flights() {
-        log.debug("Getting provider 1 flights");
-        // FIXME Hardcoded URI
-        return restTemplate.getForObject("http://localhost:8082/items", List.class);
+    public List<Item> getProvider1Items() {
+        log.debug("Getting provider 1 flights {}", providers1URI);
+        return restTemplate.getForObject(providers1URI, List.class);
     }
 
-    public List<Item> getProvider2Flights() {
-        log.debug("Getting provider 2 flights");
-        // FIXME Hardcoded URI
-        return restTemplate.getForObject("http://localhost:8083/items", List.class);
+    public List<Item> getProvider2Items() {
+        log.debug("Getting provider 2 flights {}", providers2URI);
+        return restTemplate.getForObject(providers2URI, List.class);
     }
 
     @Async
     public CompletableFuture<List<Item>> getProvider1FlightsAsync() {
-        return CompletableFuture.completedFuture(getProvider1Flights());
+        return CompletableFuture.completedFuture(getProvider1Items());
     }
 
     @Async
     public CompletableFuture<List<Item>> getProvider2FlightsAsync() {
-        return CompletableFuture.completedFuture(getProvider2Flights());
+        return CompletableFuture.completedFuture(getProvider2Items());
     }
 }
