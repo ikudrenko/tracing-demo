@@ -1,0 +1,11 @@
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+server:
+  port: 8089
+
+nsq:
+  url: "localhost:4161"
+  topic: "demoTopic"
+  channel: "some"

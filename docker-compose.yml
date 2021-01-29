@@ -1,0 +1,81 @@
+version: "3.3"
+
+services:
+
+  # https://hub.docker.com/_/mysql
+  item-provider1-db:
+    image: "mysql:5.7"
+    ports:
+      - "3306:3306"
+    restart: "always"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_USER: "root"
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_USER: "provider1"
+      MYSQL_PASSWORD: "p@ssw0rd"
+      MYSQL_DATABASE: "provider1"
+    volumes:
+      - "./item-provider-1/dbdata:/var/lib/mysql"
+      - "./item-provider-1/scripts/init-db.sql:/data/application/init-db.sql"
+    command: [
+        "--default-authentication-plugin=mysql_native_password",
+        "--init-file=/data/application/init-db.sql"
+    ]
+
+  # https://hub.docker.com/_/mysql
+  item-provider2-db:
+    image: "mysql:5.7"
+    ports:
+      - "3307:3306"
+    restart: "always"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_USER: "root"
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_USER: "provider2"
+      MYSQL_PASSWORD: "p@ssw0rd"
+      MYSQL_DATABASE: "provider2"
+    volumes:
+      - "./item-provider-2/dbdata:/var/lib/mysql"
+      - "./item-provider-2/scripts/init-db.sql:/data/application/init-db.sql"
+    command: [
+        "--default-authentication-plugin=mysql_native_password",
+        "--init-file=/data/application/init-db.sql"
+    ]
+
+  # https://www.jaegertracing.io/docs/1.18/getting-started/
+  jaeger:
+    image: "jaegertracing/all-in-one:latest"
+    ports:
+      - "16686:16686"
+      - "14250:14250"
+
+  zipkin:
+    image: "openzipkin/zipkin:latest"
+    ports:
+      - "9411:9411"
+
+  nsqlookupd:
+    image: 666665886686.dkr.ecr.us-east-1.amazonaws.com/life360/nsq:0.3.7
+    command: nsqlookupd --http-address=0.0.0.0:4161 --tcp-address=0.0.0.0:4160
+    ports:
+      - "4160:4160"
+      - "4161:4161"
+
+  nsqd:
+    image: 666665886686.dkr.ecr.us-east-1.amazonaws.com/life360/nsq:0.3.7
+    command: nsqd --lookupd-tcp-address=nsqlookupd:4160
+    ports:
+      - "4150:4150"
+      - "4151:4151"
+    depends_on:
+      - nsqlookupd
+
+  nsqadmin:
+    image: 666665886686.dkr.ecr.us-east-1.amazonaws.com/life360/nsq:0.3.7
+    command: nsqadmin --lookupd-http-address=nsqlookupd:4161
+    ports:
+      - "4171:4171"
+    depends_on:
+      - nsqlookupd

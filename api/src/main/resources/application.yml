@@ -1,0 +1,13 @@
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+
+server:
+  port: 8081
+
+provider1:
+  uri: "http://localhost:8083/items"
+
+
+provider2:
+  uri: "http://localhost:8082/items"

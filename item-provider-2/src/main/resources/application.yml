@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://localhost:3307/provider2?autoReconnect=true"
+    username: "provider2"
+    password: "p@ssw0rd"
+    hikari:
+      initialization-fail-timeout: 0
+      maximum-pool-size: 8
+      minimum-idle: 0
+    jpa:
+      openInView: true
+      database: "MYSQL"
+      show-sql: false
+      generate-ddl: false
+      hibernate.naming_strategy: "org.hibernate.cfg.ImprovedNamingStrategy"
+
+#logging:
+#  level:
+#    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+#
+server:
+  port: 8082

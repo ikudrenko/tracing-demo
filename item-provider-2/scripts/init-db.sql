@@ -1,0 +1,17 @@
+SET GLOBAL TIME_ZONE ='+00:00';
+
+DROP DATABASE IF EXISTS provider2;
+CREATE DATABASE provider2 CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE provider2;
+
+CREATE TABLE item (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(20) NOT NULL,
+  PRIMARY KEY(id)
+) ENGINE=InnoDB;
+
+INSERT INTO item VALUES
+  (1, 'CAR item'),
+  (2, 'Stick'),
+  (3, 'pen')
+;
