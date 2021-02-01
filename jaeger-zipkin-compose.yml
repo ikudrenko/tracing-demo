@@ -81,7 +81,7 @@ services:
   api:
     image: "tracing-demo/api:jaeger-zipkin-latest"
     environment:
-      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=api-Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter=jaeger,zipkin -Dotel.exporter.jaeger.endpoint=jaeger:14250 -Dotel.exporter.zipkin.endpoint=http://zipkin:9411/api/v2/spans -Dotel.exporter.jaeger.service.name=api -Dotel.exporter.zipkin.service.name=api -Dspring.profiles.active=docker
     ports:
       - "8081:8081"
     depends_on:
@@ -91,7 +91,7 @@ services:
   item-provider-1:
     image: "tracing-demo/item-provider-1:jaeger-zipkin-latest"
     environment:
-      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=provider1 -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter=jaeger,zipkin -Dotel.exporter.jaeger.endpoint=jaeger:14250 -Dotel.exporter.zipkin.endpoint=http://zipkin:9411/api/v2/spans -Dotel.exporter.jaeger.service.name=provider1 -Dotel.exporter.zipkin.service.name=provider1 -Dspring.profiles.active=docker
     ports:
       - "8083:8083"
     depends_on:
@@ -102,7 +102,7 @@ services:
   item-provider-2:
     image: "tracing-demo/item-provider-2:jaeger-zipkin-latest"
     environment:
-      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=provider2 -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter=jaeger,zipkin -Dotel.exporter.jaeger.endpoint=jaeger:14250 -Dotel.exporter.zipkin.endpoint=http://zipkin:9411/api/v2/spans -Dotel.exporter.jaeger.service.name=provider2 -Dotel.exporter.zipkin.service.name=provider2 -Dspring.profiles.active=docker
     ports:
       - "8082:8082"
     depends_on:
@@ -111,7 +111,7 @@ services:
   notification-comsumer:
     image: "tracing-demo/notification-consumer:jaeger-zipkin-latest"
     environment:
-      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=consumer -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter=jaeger,zipkin -Dotel.exporter.jaeger.endpoint=jaeger:14250 -Dotel.exporter.zipkin.endpoint=http://zipkin:9411/api/v2/spans -Dotel.exporter.jaeger.service.name=consumer -Dotel.exporter.zipkin.service.name=consumer -Dspring.profiles.active=docker
     depends_on:
       - nsqlookupd
       - nsqd
