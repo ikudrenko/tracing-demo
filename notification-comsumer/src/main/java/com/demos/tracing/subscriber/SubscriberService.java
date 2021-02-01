@@ -1,10 +1,19 @@
 package com.demos.tracing.subscriber;
 
+import java.util.Collections;
 import javax.annotation.PreDestroy;
 
 import com.demo.tracing.domain.TracingMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutsocial.nsq.Subscriber;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Span.Kind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.context.propagation.TextMapPropagator.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,16 +25,29 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubscriberService {
 
-    private final Subscriber subscriber ;
-    private ObjectMapper om = new ObjectMapper();
+    private final Subscriber subscriber;
+    private final ObjectMapper om = new ObjectMapper();
     private final String topic;
     private final String channel;
+    private final Tracer tracer =
+          OpenTelemetry.getGlobalTracerProvider().get("com.demos.tracing.subscriber.SubscriberService");
+    private static final TextMapPropagator.Getter<String> getter = new Getter<>() {
+        @Override
+        public Iterable<String> keys(String s) {
+            return () -> Collections.singletonList(s).iterator();
+        }
+        @Override
+        public String get(String s, String s2) {
+            return s;
+        }
+    };
 
-    public SubscriberService(@Value("${nsq.topic}") String topic,
+    public SubscriberService(
+          @Value("${nsq.topic}") String topic,
           @Value("${nsq.channel}") String channel,
           @Value("${nsq.url}") String url) {
-        subscriber = new Subscriber(url);
-        log.info("SUbscription url {}", url);
+        log.info("url {}", url);
+        this.subscriber = new Subscriber(url);
         this.channel = channel;
         this.topic = topic;
     }
@@ -40,20 +62,17 @@ public class SubscriberService {
     private void handleMessage(byte[] data) {
         log.info("Received message {}", new String(data));
         TracingMessage dm = om.readValue(data, TracingMessage.class);
-        log.info("TracingMessage  {}", TracingMessage.class);
-//
-//        Context extractedContext = OpenTelemetry.getGlobalPropagators()
-//                                                .getTextMapPropagator()
-//                                                .extract(Context.current(), dm.getTraceparent(), getter);
-//        Span span1 = Span.fromContext(extractedContext);
-//        Span child = tracer.spanBuilder("handleMessage").setParent(extractedContext).setSpanKind(Kind.CONSUMER).startSpan();
-//        try (Scope scope = child.makeCurrent()) {
-//            log.info("Span id {}", child.getSpanContext().getSpanIdAsHexString());
-//            child.setAttribute("operation", "Save to db");
-//        } finally {
-//            child.end();
-//        }
-//        log.info("Span id {}", span1.getSpanContext().getSpanIdAsHexString());
+
+        Context extractedContext = OpenTelemetry.getGlobalPropagators()
+                                                .getTextMapPropagator()
+                                                .extract(Context.current(), dm.getTraceHeader(), getter);
+        Span child = tracer.spanBuilder("handleMessage").setParent(extractedContext).setSpanKind(Kind.CONSUMER).startSpan();
+        try (Scope scope = child.makeCurrent()) {
+            log.info("Span id {}", child.getSpanContext().getSpanIdAsHexString());
+            child.setAttribute("operation", "Save to db");
+        } finally {
+            child.end();
+        }
 
     }
 

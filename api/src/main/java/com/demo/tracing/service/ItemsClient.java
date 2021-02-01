@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.demo.tracing.domain.Item;
+import io.opentelemetry.extension.annotations.WithSpan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,11 +32,13 @@ public class ItemsClient {
 
     }
 
+    @WithSpan
     public List<Item> getProvider1Items() {
         log.debug("Getting provider 1 flights {}", providers1URI);
         return restTemplate.getForObject(providers1URI, List.class);
     }
 
+    @WithSpan
     public List<Item> getProvider2Items() {
         log.debug("Getting provider 2 flights {}", providers2URI);
         return restTemplate.getForObject(providers2URI, List.class);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.demo.tracing.domain.Item;
+import io.opentelemetry.extension.annotations.WithSpan;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ public class ItemsService {
 
     private final ItemsClient itemsClient;
 
+    @WithSpan
     @SneakyThrows
     public List<Item> getItems() {
         CompletableFuture<List<Item>> items1 = itemsClient.getProvider1FlightsAsync();
