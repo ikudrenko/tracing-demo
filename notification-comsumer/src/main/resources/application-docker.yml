@@ -1,3 +1,2 @@
 nsq:
-  publisher:
-    host: "nsqlookupd:4161"
+  url: "nsqlookupd:4161"

@@ -5,7 +5,9 @@ import javax.annotation.PreDestroy;
 import com.demo.tracing.domain.TracingMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutsocial.nsq.Publisher;
+import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.extension.annotations.WithSpan;
 import lombok.SneakyThrows;
@@ -21,19 +23,16 @@ public class NotificationPublisher {
     private final Publisher publisher;
     private final String topic;
     private final ObjectMapper om = new ObjectMapper();
+    private static final TextMapPropagator.Setter<TracingMessage> setter =
+          (tracingMessage, key, traceHeader) -> tracingMessage.setTraceHeader(traceHeader);
 
     public NotificationPublisher(
           @Value("${nsq.publisher.host}") String publisherHost,
           @Value("${nsq.publisher.topic}") String publishTopic) {
-        publisher = new Publisher("localhost:4150");
+        publisher = new Publisher(publisherHost);
         topic = publishTopic;
     }
 
-    private TextMapPropagator.Setter<String> setter = (s, s2, s1) -> {//todo: refactor
-        log.info("TextMapPropagator.Setter carrier {}", s);
-        log.info("TextMapPropagator.Setter Key {}", s2);
-        log.info("TextMapPropagator.Setter Value {}", s1);
-    };
 
     @Async
     @WithSpan
@@ -41,17 +40,12 @@ public class NotificationPublisher {
     public void publishMessageAsync(String message) {
         log.info("Topic {}, message {}", topic, message);
 
-        Span span = Span.current();
-        String spanID = span.getSpanContext().getSpanIdAsHexString();
-        String traceID = span.getSpanContext().getTraceIdAsHexString();
+        TracingMessage message1 = new TracingMessage(null, message);
 
-//
-//
-//        OpenTelemetry.getGlobalPropagators()
-//                     .getTextMapPropagator()
-//                     .inject(Context.current(), s, setter);
+        OpenTelemetry.getGlobalPropagators()
+                     .getTextMapPropagator()
+                     .inject(Context.current(), message1, setter);
 
-        TracingMessage message1 = new TracingMessage("00-" + traceID + "-" + spanID + "-01", message);
         publisher.publish(topic, om.writeValueAsBytes(message1));
     }
 
