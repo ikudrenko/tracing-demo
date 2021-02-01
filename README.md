@@ -3,6 +3,7 @@
 OpenTelemetry demo projects supports shows ability of tracing using auto-instrumentation feature.
 
 # Architecture diagram
+![diagramm](ServiceArchitecture.png)
 
 # Run
 ## Jaeger, Zipkin
@@ -18,3 +19,4 @@ make jaeger-zipkin-up
 
 # Endpoint
 - API: http://localhost:8081
+
