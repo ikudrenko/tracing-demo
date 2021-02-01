@@ -66,20 +66,10 @@ services:
     depends_on:
       - nsqlookupd
 
-
-  jaeger:
-    image: "jaegertracing/all-in-one:latest"
-    ports:
-      - "16686:16686"
-      - "14250:14250"
-
-  zipkin:
-    image: "openzipkin/zipkin:latest"
-    ports:
-      - "9411:9411"
-
   api:
     image: "tracing-demo/api:newrelic-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=api -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
     ports:
       - "8081:8081"
     depends_on:
@@ -88,6 +78,8 @@ services:
 
   item-provider-1:
     image: "tracing-demo/item-provider-1:newrelic-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=provider1 -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
     ports:
       - "8083:8083"
     depends_on:
@@ -97,6 +89,8 @@ services:
 
   item-provider-2:
     image: "tracing-demo/item-provider-2:newrelic-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=provider2 -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
     ports:
       - "8082:8082"
     depends_on:
@@ -104,6 +98,8 @@ services:
 
   notification-comsumer:
     image: "tracing-demo/notification-consumer:newrelic-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=consumer -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
     depends_on:
       - nsqlookupd
       - nsqd

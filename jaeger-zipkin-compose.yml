@@ -1,0 +1,117 @@
+version: "3.3"
+
+services:
+
+  # https://hub.docker.com/_/mysql
+  item-provider1-db:
+    image: "mysql:5.7"
+    ports:
+      - "3306:3306"
+    restart: "always"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_USER: "root"
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_USER: "provider1"
+      MYSQL_PASSWORD: "p@ssw0rd"
+      MYSQL_DATABASE: "provider1"
+    volumes:
+      - "./item-provider-1/scripts/init-db.sql:/data/application/init-db.sql"
+    command: [
+        "--default-authentication-plugin=mysql_native_password",
+        "--init-file=/data/application/init-db.sql"
+    ]
+
+  # https://hub.docker.com/_/mysql
+  item-provider2-db:
+    image: "mysql:5.7"
+    ports:
+      - "3307:3306"
+    restart: "always"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_USER: "root"
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_USER: "provider2"
+      MYSQL_PASSWORD: "p@ssw0rd"
+      MYSQL_DATABASE: "provider2"
+    volumes:
+      - "./item-provider-2/scripts/init-db.sql:/data/application/init-db.sql"
+    command: [
+        "--default-authentication-plugin=mysql_native_password",
+        "--init-file=/data/application/init-db.sql"
+    ]
+
+  nsqlookupd:
+    image: nsqio/nsq
+    command: nsqlookupd --http-address=0.0.0.0:4161 --tcp-address=0.0.0.0:4160
+    ports:
+      - "4160:4160"
+      - "4161:4161"
+
+  nsqd:
+    image: nsqio/nsq
+    command: nsqd --lookupd-tcp-address=nsqlookupd:4160
+    ports:
+      - "4150:4150"
+      - "4151:4151"
+    depends_on:
+      - nsqlookupd
+
+  nsqadmin:
+    image: nsqio/nsq
+    command: nsqadmin --lookupd-http-address=nsqlookupd:4161
+    ports:
+      - "4171:4171"
+    depends_on:
+      - nsqlookupd
+
+
+  jaeger:
+    image: "jaegertracing/all-in-one:latest"
+    ports:
+      - "16686:16686"
+      - "14250:14250"
+
+  zipkin:
+    image: "openzipkin/zipkin:latest"
+    ports:
+      - "9411:9411"
+
+  api:
+    image: "tracing-demo/api:jaeger-zipkin-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=api-Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+    ports:
+      - "8081:8081"
+    depends_on:
+      - item-provider-1
+      - item-provider-2
+
+  item-provider-1:
+    image: "tracing-demo/item-provider-1:jaeger-zipkin-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=provider1 -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+    ports:
+      - "8083:8083"
+    depends_on:
+      - nsqlookupd
+      - nsqd
+      - item-provider1-db
+
+  item-provider-2:
+    image: "tracing-demo/item-provider-2:jaeger-zipkin-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=provider2 -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+    ports:
+      - "8082:8082"
+    depends_on:
+      - item-provider2-db
+
+  notification-comsumer:
+    image: "tracing-demo/notification-consumer:jaeger-zipkin-latest"
+    environment:
+      - TRACING_OPTS=-javaagent:./opentelemetry-javaagent-all.jar -Dotel.exporter.jar=./opentelemetry-exporters-newrelic-auto-0.12.0.jar -Dnewrelic.api.key=${NEW_RELIC_API_KEY} -Dnewrelic.service.name=consumer -Dnewrelic.trace.uri.override=https://trace-api.eu.newrelic.com/trace/v1
+    depends_on:
+      - nsqlookupd
+      - nsqd
