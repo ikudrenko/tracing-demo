@@ -79,7 +79,7 @@ services:
       - "9411:9411"
 
   api:
-    image: "tracing-demo/api:jaeger-zipkin-latest"
+    image: "tracing-demo/api:newrelic-latest"
     ports:
       - "8081:8081"
     depends_on:
@@ -87,7 +87,7 @@ services:
       - item-provider-2
 
   item-provider-1:
-    image: "tracing-demo/item-provider-1:jaeger-zipkin-latest"
+    image: "tracing-demo/item-provider-1:newrelic-latest"
     ports:
       - "8083:8083"
     depends_on:
@@ -96,14 +96,14 @@ services:
       - item-provider1-db
 
   item-provider-2:
-    image: "tracing-demo/item-provider-2:jaeger-zipkin-latest"
+    image: "tracing-demo/item-provider-2:newrelic-latest"
     ports:
       - "8082:8082"
     depends_on:
       - item-provider2-db
 
   notification-comsumer:
-    image: "tracing-demo/notification-consumer:jaeger-zipkin-latest"
+    image: "tracing-demo/notification-consumer:newrelic-latest"
     depends_on:
       - nsqlookupd
       - nsqd
