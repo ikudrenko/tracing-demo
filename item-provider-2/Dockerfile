@@ -1,6 +1,5 @@
 FROM  adoptopenjdk/openjdk11:alpine-jre
 
-ENV SERVICE_NAME "prov2"
 ENV APP_HOME /app/bin
 
 RUN mkdir -p ${APP_HOME}

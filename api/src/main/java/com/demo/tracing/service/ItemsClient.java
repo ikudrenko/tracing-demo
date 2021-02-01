@@ -34,13 +34,11 @@ public class ItemsClient {
 
     @WithSpan
     public List<Item> getProvider1Items() {
-        log.debug("Getting provider 1 flights {}", providers1URI);
         return restTemplate.getForObject(providers1URI, List.class);
     }
 
     @WithSpan
     public List<Item> getProvider2Items() {
-        log.debug("Getting provider 2 flights {}", providers2URI);
         return restTemplate.getForObject(providers2URI, List.class);
     }
 

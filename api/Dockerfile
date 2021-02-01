@@ -1,6 +1,5 @@
 FROM  adoptopenjdk/openjdk11:alpine-jre
 
-ENV SERVICE_NAME "api"
 ENV APP_HOME /app/bin
 
 RUN mkdir -p ${APP_HOME}

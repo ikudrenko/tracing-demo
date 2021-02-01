@@ -20,7 +20,6 @@ public class ItemService {
 
     @WithSpan
     public List<Item> getAllItems() {
-        log.info("This thread", Thread.currentThread().getName());
         publisher.publishMessageAsync("New get All items request" + Instant.now());
         return repository.findAll();
     }
