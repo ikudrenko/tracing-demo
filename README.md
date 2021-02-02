@@ -14,7 +14,7 @@ make jaeger-zipkin-up
 For new relic integration API key should be provided.
 API key should be set in Makefile in NEW_RELIC_API_KEY variable 
 ```
-make jaeger-zipkin-up
+make newrelic-up
 ```
 
 # Endpoint
