@@ -6,7 +6,10 @@ OpenTelemetry demo projects supports shows ability of tracing using auto-instrum
 ![diagramm](ServiceArchitecture.png)
 
 # Run
-## Jaeger, Zipkin
+## Jaeger
+http://localhost:16686/
+## Zipkin
+http://localhost:9411/zipkin/
 ```
 make jaeger-zipkin-up
 ```
