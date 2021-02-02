@@ -18,5 +18,5 @@ make newrelic-up
 ```
 
 # Endpoint
-- API: http://localhost:8081
+- API: http://localhost:8081/items
 
