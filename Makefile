@@ -1,6 +1,6 @@
 TRACING ?= none
 DOCKER_COMPOSE_FILE_NAME ?= none
-NEW_RELIC_API_KEY =NRII--J-5K9wbxM8Lt_28iCyPqkoZjTA_AGBU
+NEW_RELIC_API_KEY =
 
 #New relic trace exporter requires API key
 #
