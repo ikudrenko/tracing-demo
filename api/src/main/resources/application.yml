@@ -1,6 +1,14 @@
 logging:
   level:
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p --- [%15.15t] %X{traceId} %X{spanId}  %-40c{1.} : %m %n"
+
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+
 
 server:
   port: 8081
